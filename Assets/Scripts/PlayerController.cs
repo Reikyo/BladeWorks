@@ -8,6 +8,7 @@ public class PlayerController : MonoBehaviour
     private bool bInMotionLastFrame = false;
     private bool bInMotionThisFrame = false;
     private float fMetresPerSecWalk = 5f;
+    private float fForceJump = 70f;
     private float fInputHorz;
     private float fInputVert;
     private Vector3 v3DirectionMove;
@@ -21,8 +22,6 @@ public class PlayerController : MonoBehaviour
     // private float jumpSpeed = 2f;
     // private float gravity = 10f;
     // private Vector3 v3DirectionMoveJump = Vector3.zero;
-
-    private float fForceJump = 50f;
 
     // ------------------------------------------------------------------------------------------------
 
@@ -50,7 +49,12 @@ public class PlayerController : MonoBehaviour
         {
             bInMotionThisFrame = true;
 
-            v3DirectionMove = ((fInputHorz * Vector3.right) + (fInputVert * Vector3.forward)).normalized;
+            // This is good for player control from a fixed camera angle in world space:
+            // v3DirectionMove = ((fInputHorz * Vector3.right) + (fInputVert * Vector3.forward)).normalized;
+
+            // This is good for player control from a fixed camera angle in local space:
+            v3DirectionMove = ((fInputHorz * transform.right) + (fInputVert * transform.forward)).normalized;
+
             v3DirectionLook = Vector3.RotateTowards(transform.forward, v3DirectionMove, fMetresPerSecWalk * Time.deltaTime, 0f);
 
             transform.position = Vector3.MoveTowards(transform.position, transform.position + v3DirectionMove, fMetresPerSecWalk * Time.deltaTime);
