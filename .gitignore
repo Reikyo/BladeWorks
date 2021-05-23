@@ -1,0 +1,15 @@
+.vs
+Asset_Store_Web
+Assets/Asset\ Store*
+Assets/NavMeshComponents*
+Assets/TextMesh\ Pro*
+Backups
+Build
+Library
+Logs
+obj
+Packages
+Temp
+Videos
+*.csproj
+*.sln
