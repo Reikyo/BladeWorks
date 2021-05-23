@@ -12,15 +12,25 @@ public class PlayerController : MonoBehaviour
     private float fInputVert;
     private Vector3 v3DirectionMove;
     private Vector3 v3DirectionLook;
+    private Rigidbody rbPlayer;
     private Animator anPlayer;
     public Animator[] anPlayerChildren;
     private float fSpeedAnPlayerChild;
+
+    // private CharacterController ccPlayer;
+    // private float jumpSpeed = 2f;
+    // private float gravity = 10f;
+    // private Vector3 v3DirectionMoveJump = Vector3.zero;
+
+    private float fForceJump = 50f;
 
     // ------------------------------------------------------------------------------------------------
 
     // Start is called before the first frame update
     void Start()
     {
+        // ccPlayer = GetComponent<CharacterController>();
+        rbPlayer = GetComponent<Rigidbody>();
         anPlayer = GetComponent<Animator>();
         anPlayerChildren = GetComponentsInChildren<Animator>(); // n.b. This only gets the component of the first child in the tree
     }
@@ -45,6 +55,8 @@ public class PlayerController : MonoBehaviour
 
             transform.position = Vector3.MoveTowards(transform.position, transform.position + v3DirectionMove, fMetresPerSecWalk * Time.deltaTime);
             transform.rotation = Quaternion.LookRotation(v3DirectionLook);
+
+            // ccPlayer.Move(v3DirectionMove * fMetresPerSecWalk * Time.deltaTime);
         }
         else
         {
@@ -55,7 +67,7 @@ public class PlayerController : MonoBehaviour
 
         if (bInMotionLastFrame != bInMotionThisFrame)
         {
-            Debug.Log("Here");
+            // Debug.Log("Here");
             if (bInMotionThisFrame)
             {
                 fSpeedAnPlayerChild = 1f;
@@ -64,6 +76,7 @@ public class PlayerController : MonoBehaviour
             {
                 fSpeedAnPlayerChild = 0f;
             }
+            // anPlayer.SetFloat("fSpeedAnPlayerChild", fSpeedAnPlayerChild);
             // Only needed if the character model has multiple animated parts
             foreach (Animator anPlayerChild in anPlayerChildren)
             {
@@ -78,8 +91,45 @@ public class PlayerController : MonoBehaviour
 
         // ------------------------------------------------------------------------------------------------
 
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            rbPlayer.AddForce(fForceJump * Vector3.up, ForceMode.Impulse);
+        }
+
+        if (Input.GetKeyDown(KeyCode.Return))
+        {
+            // anPlayer.SetBool("bAttack", true);
+            foreach (Animator anPlayerChild in anPlayerChildren)
+            {
+                anPlayerChild.SetBool("bAttack", true);
+            }
+            StartCoroutine(Wait());
+        }
+
+        // if (ccPlayer.isGrounded)
+        // {
+        //     if (Input.GetKeyDown(KeyCode.Space))
+        //     {
+        //         v3DirectionMoveJump.y = jumpSpeed;
+        //     }
+        // }
+        // else
+        // {
+        //     v3DirectionMoveJump.y -= gravity * Time.deltaTime;
+        //     ccPlayer.Move(v3DirectionMoveJump * Time.deltaTime);
+        // }
+
     }
 
     // ------------------------------------------------------------------------------------------------
+
+    IEnumerator Wait()
+    {
+        yield return new WaitForSeconds(1f);
+        foreach (Animator anPlayerChild in anPlayerChildren)
+        {
+            anPlayerChild.SetBool("bAttack", false);
+        }
+    }
 
 }
