@@ -45,9 +45,9 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.H))
+        if (Input.GetKeyDown(KeyCode.P))
         {
-            Debug.Log("Hit");
+            Debug.Log("Player hit");
             fHealth -= 10f;
             if (fHealth >= sliHealth.minValue)
             {
