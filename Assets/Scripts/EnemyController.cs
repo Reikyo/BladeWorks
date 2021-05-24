@@ -60,7 +60,7 @@ public class EnemyController : MonoBehaviour
                 - 0.5f * transform.right
             );
             anEnemy.SetBool("bMotionWalk", false);
-            anEnemy.SetTrigger("tAttack");
+            anEnemy.SetTrigger("trgAttack");
         }
     }
 

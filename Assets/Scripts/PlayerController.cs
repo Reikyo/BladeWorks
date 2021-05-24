@@ -18,8 +18,9 @@ public class PlayerController : MonoBehaviour
     private Animator anPlayer;
     public Animator[] anPlayerChildren;
     private float fSpeedAnPlayerChild;
-    public float fHealth;
-    private float fHealthMax = 100f;
+    private int iHealthMax = 100;
+    private int iHealth;
+    private bool bAlive;
     public Slider sliHealth;
 
     // private CharacterController ccPlayer;
@@ -36,8 +37,9 @@ public class PlayerController : MonoBehaviour
         rbPlayer = GetComponent<Rigidbody>();
         anPlayer = GetComponent<Animator>();
         anPlayerChildren = GetComponentsInChildren<Animator>(); // n.b. This only gets the component of the first child in the tree
-        fHealth = fHealthMax;
-        sliHealth.value = fHealth;
+        iHealth = iHealthMax;
+        bAlive = iHealth > 0;
+        sliHealth.value = iHealth;
     }
 
     // ------------------------------------------------------------------------------------------------
@@ -47,17 +49,7 @@ public class PlayerController : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.P))
         {
-            Debug.Log("Player hit");
-            fHealth -= 10f;
-            if (fHealth >= sliHealth.minValue)
-            {
-                sliHealth.value = fHealth;
-            }
-            if (fHealth <= 0f)
-            {
-                fHealth = 0f;
-                sliHealth.transform.Find("Fill Area").gameObject.SetActive(false);
-            }
+            Attacked(10);
         }
     }
 
@@ -66,9 +58,6 @@ public class PlayerController : MonoBehaviour
     // FixedUpdate is called once per frame
     void FixedUpdate()
     {
-
-        // ------------------------------------------------------------------------------------------------
-
         fInputHorz = Input.GetAxis("Horizontal");
         fInputVert = Input.GetAxis("Vertical");
 
@@ -132,9 +121,9 @@ public class PlayerController : MonoBehaviour
             // anPlayer.SetBool("bAttack", true);
             foreach (Animator anPlayerChild in anPlayerChildren)
             {
-                anPlayerChild.SetBool("bAttack", true);
+                anPlayerChild.SetTrigger("trgAttack");
             }
-            StartCoroutine(Wait());
+            // StartCoroutine(Wait());
         }
 
         // if (ccPlayer.isGrounded)
@@ -154,30 +143,46 @@ public class PlayerController : MonoBehaviour
 
     // ------------------------------------------------------------------------------------------------
 
-    IEnumerator Wait()
+    // IEnumerator Wait()
+    // {
+    //     yield return new WaitForSeconds(1f);
+    //     foreach (Animator anPlayerChild in anPlayerChildren)
+    //     {
+    //         anPlayerChild.SetBool("bAttack", false);
+    //     }
+    // }
+
+    // ------------------------------------------------------------------------------------------------
+
+    public void Attacked(int iDamage)
     {
-        yield return new WaitForSeconds(1f);
-        foreach (Animator anPlayerChild in anPlayerChildren)
+        if (iDamage <= 0)
         {
-            anPlayerChild.SetBool("bAttack", false);
+            return;
+        }
+        if (iHealth > iDamage)
+        {
+            Debug.Log("Player hit");
+            iHealth -= iDamage;
+            sliHealth.value = iHealth;
+            foreach (Animator anPlayerChild in anPlayerChildren)
+            {
+                anPlayerChild.SetTrigger("trgAttacked");
+            }
+        }
+        else if (iHealth > 0)
+        {
+            iHealth = 0;
+            bAlive = false;
+            sliHealth.transform.Find("Fill Area").gameObject.SetActive(false);
+            foreach (Animator anPlayerChild in anPlayerChildren)
+            {
+                anPlayerChild.SetTrigger("trgKilled");
+            }
+            gameObject.GetComponent<PlayerController>().enabled = false; // This line disables this script!
         }
     }
 
     // ------------------------------------------------------------------------------------------------
-
-    public void Damage(float fDamage)
-    {
-        Debug.Log("Player hit");
-        fHealth -= fDamage;
-        if (fHealth >= sliHealth.minValue)
-        {
-            sliHealth.value = fHealth;
-        }
-        if (fHealth <= 0f)
-        {
-            fHealth = 0f;
-            sliHealth.transform.Find("Fill Area").gameObject.SetActive(false);
-        }
-    }
 
 }

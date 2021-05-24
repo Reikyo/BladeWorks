@@ -22,7 +22,7 @@ public class EnemyFistController : MonoBehaviour
     {
         if (collider.gameObject.CompareTag("Player"))
         {
-            playerController.Damage(10f);
+            playerController.Attacked(10);
         }
     }
 
