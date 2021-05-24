@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.UI;
 
 public class EnemyController : MonoBehaviour
@@ -11,6 +12,9 @@ public class EnemyController : MonoBehaviour
     private float fHealthMax = 100f;
     public Slider sliHealth;
 
+    private UnityEngine.AI.NavMeshAgent navEnemy;
+    private GameObject goPlayer;
+
     // ------------------------------------------------------------------------------------------------
 
     // Start is called before the first frame update
@@ -18,6 +22,9 @@ public class EnemyController : MonoBehaviour
     {
         fHealth = fHealthMax;
         sliHealth.value = fHealth;
+
+        navEnemy = GetComponent<NavMeshAgent>();
+        goPlayer = GameObject.FindWithTag("Player");
     }
 
     // ------------------------------------------------------------------------------------------------
@@ -39,6 +46,7 @@ public class EnemyController : MonoBehaviour
                 sliHealth.transform.Find("Fill Area").gameObject.SetActive(false);
             }
         }
+        navEnemy.destination = goPlayer.transform.position;
     }
 
     // ------------------------------------------------------------------------------------------------
