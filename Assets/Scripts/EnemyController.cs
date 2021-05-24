@@ -10,8 +10,8 @@ public class EnemyController : MonoBehaviour
     public float fHealth;
     private float fHealthMax = 100f;
     public Slider sliHealth;
-
-    private UnityEngine.AI.NavMeshAgent navEnemy;
+    private Animator anEnemy;
+    private NavMeshAgent navEnemy;
     private GameObject goPlayer;
 
     // ------------------------------------------------------------------------------------------------
@@ -22,6 +22,7 @@ public class EnemyController : MonoBehaviour
         fHealth = fHealthMax;
         sliHealth.value = fHealth;
 
+        anEnemy = GetComponent<Animator>();
         navEnemy = GetComponent<NavMeshAgent>();
         goPlayer = GameObject.FindWithTag("Player");
     }
@@ -45,7 +46,18 @@ public class EnemyController : MonoBehaviour
                 sliHealth.transform.Find("Fill Area").gameObject.SetActive(false);
             }
         }
+
         navEnemy.destination = goPlayer.transform.position;
+
+        if (navEnemy.remainingDistance > navEnemy.stoppingDistance)
+        {
+            anEnemy.SetBool("bMotionWalk", true);
+        }
+        else
+        {
+            anEnemy.SetBool("bMotionWalk", false);
+            anEnemy.SetTrigger("tAttack");
+        }
     }
 
     // ------------------------------------------------------------------------------------------------
