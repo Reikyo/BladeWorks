@@ -2,6 +2,7 @@ using System;
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
@@ -17,6 +18,9 @@ public class PlayerController : MonoBehaviour
     private Animator anPlayer;
     public Animator[] anPlayerChildren;
     private float fSpeedAnPlayerChild;
+    public float fHealth;
+    private float fHealthMax = 100f;
+    public Slider sliHealth;
 
     // private CharacterController ccPlayer;
     // private float jumpSpeed = 2f;
@@ -32,6 +36,29 @@ public class PlayerController : MonoBehaviour
         rbPlayer = GetComponent<Rigidbody>();
         anPlayer = GetComponent<Animator>();
         anPlayerChildren = GetComponentsInChildren<Animator>(); // n.b. This only gets the component of the first child in the tree
+        fHealth = fHealthMax;
+        sliHealth.value = fHealth;
+    }
+
+    // ------------------------------------------------------------------------------------------------
+
+    // Update is called once per frame
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.H))
+        {
+            Debug.Log("Hit");
+            fHealth -= 10f;
+            if (fHealth >= sliHealth.minValue)
+            {
+                sliHealth.value = fHealth;
+            }
+            if (fHealth <= 0f)
+            {
+                fHealth = 0f;
+                sliHealth.transform.Find("Fill Area").gameObject.SetActive(false);
+            }
+        }
     }
 
     // ------------------------------------------------------------------------------------------------

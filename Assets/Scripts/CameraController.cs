@@ -4,9 +4,12 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
-    public float fOffsetRight = 0f;
-    public float fOffsetForward = -5f;
-    public float fOffsetUp = 2f;
+    public float fPosOffsetRight = 0f;
+    public float fPosOffsetForward = -5f;
+    public float fPosOffsetUp = 2f;
+    public float fLookAtOffsetRight = 0f;
+    public float fLookAtOffsetForward = 0f;
+    public float fLookAtOffsetUp = 2f;
     private GameObject goPlayer;
 
     // ------------------------------------------------------------------------------------------------
@@ -24,10 +27,15 @@ public class CameraController : MonoBehaviour
     {
         transform.position =
             goPlayer.transform.position
-            + fOffsetRight * goPlayer.transform.right
-            + fOffsetForward * goPlayer.transform.forward
-            + fOffsetUp * goPlayer.transform.up;
-        transform.LookAt(goPlayer.transform.position);
+            + fPosOffsetRight * goPlayer.transform.right
+            + fPosOffsetForward * goPlayer.transform.forward
+            + fPosOffsetUp * goPlayer.transform.up;
+        transform.LookAt(
+            goPlayer.transform.position
+            + fLookAtOffsetRight * goPlayer.transform.right
+            + fLookAtOffsetForward * goPlayer.transform.forward
+            + fLookAtOffsetUp * goPlayer.transform.up
+        );
     }
 
     // ------------------------------------------------------------------------------------------------
