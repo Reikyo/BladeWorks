@@ -6,7 +6,6 @@ using UnityEngine.UI;
 
 public class EnemyController : MonoBehaviour
 {
-
     private float fMetresPerSecWalk = 2f;
     public float fHealth;
     private float fHealthMax = 100f;
