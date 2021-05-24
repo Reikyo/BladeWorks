@@ -163,4 +163,21 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    // ------------------------------------------------------------------------------------------------
+
+    public void Damage(float fDamage)
+    {
+        Debug.Log("Player hit");
+        fHealth -= fDamage;
+        if (fHealth >= sliHealth.minValue)
+        {
+            sliHealth.value = fHealth;
+        }
+        if (fHealth <= 0f)
+        {
+            fHealth = 0f;
+            sliHealth.transform.Find("Fill Area").gameObject.SetActive(false);
+        }
+    }
+
 }

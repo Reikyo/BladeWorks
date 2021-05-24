@@ -55,6 +55,10 @@ public class EnemyController : MonoBehaviour
         }
         else
         {
+            transform.LookAt(
+                goPlayer.transform.position
+                - 0.5f * transform.right
+            );
             anEnemy.SetBool("bMotionWalk", false);
             anEnemy.SetTrigger("tAttack");
         }
