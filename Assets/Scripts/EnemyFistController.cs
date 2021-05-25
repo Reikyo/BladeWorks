@@ -5,7 +5,9 @@ using UnityEngine;
 public class EnemyFistController : MonoBehaviour
 {
     private GameObject goPlayer;
+    public GameObject goEnemy;
     private PlayerController playerController;
+    private EnemyController enemyController;
 
     // ------------------------------------------------------------------------------------------------
 
@@ -14,13 +16,15 @@ public class EnemyFistController : MonoBehaviour
     {
         goPlayer = GameObject.FindWithTag("Player");
         playerController = goPlayer.GetComponent<PlayerController>();
+        enemyController = goEnemy.GetComponent<EnemyController>();
     }
 
     // ------------------------------------------------------------------------------------------------
 
     private void OnTriggerEnter(Collider collider)
     {
-        if (collider.gameObject.CompareTag("Player"))
+        if (    (enemyController.bAttackInDamagePhase)
+            &&  (collider.gameObject.CompareTag("Player")) )
         {
             playerController.Attacked(10);
         }

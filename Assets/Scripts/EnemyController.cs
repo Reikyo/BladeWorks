@@ -1,3 +1,4 @@
+using System;
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,10 +10,13 @@ public class EnemyController : MonoBehaviour
     private float fMetresPerSecWalk = 2f;
     private int iHealthMax = 100;
     public int iHealth;
-    private bool bAlive;
+    public bool bAlive;
     public Slider sliHealth;
     private Animator anEnemy;
-    // private AnimatorClipInfo[] aninfoEnemy;
+    private float fFractionThroughAttackClip;
+    private float fFractionThroughAttackClipDamagePhaseStart = 0.50f;
+    private float fFractionThroughAttackClipDamagePhaseEnd = 0.75f;
+    public bool bAttackInDamagePhase = false;
     private NavMeshAgent navEnemy;
     private GameObject goPlayer;
     private PlayerController playerController;
@@ -48,14 +52,14 @@ public class EnemyController : MonoBehaviour
             {
                 navEnemy.enabled = false;
             }
+            if (anEnemy.GetBool("bMotionWalk"))
+            {
+                anEnemy.SetBool("bMotionWalk", false);
+            }
             if (!anEnemy.GetBool("bTrgVictory"))
             {
                 anEnemy.SetTrigger("trgVictory");
                 anEnemy.SetBool("bTrgVictory", true);
-            }
-            if (anEnemy.GetBool("bMotionWalk"))
-            {
-                anEnemy.SetBool("bMotionWalk", false);
             }
             return;
         }
@@ -71,27 +75,47 @@ public class EnemyController : MonoBehaviour
             return;
         }
 
-        if (!anEnemy.GetBool("bTrgAttack") && (this.anEnemy.GetCurrentAnimatorClipInfo(0)[0].clip.name != "Attack01"))
+        if (this.anEnemy.GetCurrentAnimatorClipInfo(0)[0].clip.name != "Attack01")
         {
-            if (anEnemy.GetBool("bMotionWalk"))
+            if (!anEnemy.GetBool("bTrgAttack"))
             {
-                anEnemy.SetBool("bMotionWalk", false);
+                if (anEnemy.GetBool("bMotionWalk"))
+                {
+                    anEnemy.SetBool("bMotionWalk", false);
+                }
+                transform.LookAt(
+                    goPlayer.transform.position
+                    - 0.5f * transform.right
+                );
+                anEnemy.SetTrigger("trgAttack");
+                anEnemy.SetBool("bTrgAttack", true);
             }
-            transform.LookAt(
-                goPlayer.transform.position
-                - 0.5f * transform.right
-            );
-            anEnemy.SetTrigger("trgAttack");
-            anEnemy.SetBool("bTrgAttack", true);
+            return;
         }
-        else if (anEnemy.GetBool("bTrgAttack") && (this.anEnemy.GetCurrentAnimatorClipInfo(0)[0].clip.name == "Attack01"))
+
+        if (anEnemy.GetBool("bTrgAttack"))
         {
             anEnemy.SetBool("bTrgAttack", false);
         }
 
-        // aninfoEnemy = this.anEnemy.GetCurrentAnimatorClipInfo(0);
-        // Debug.Log(aninfoEnemy[0].clip.name);
+        fFractionThroughAttackClip =
+            this.anEnemy.GetCurrentAnimatorStateInfo(0).normalizedTime
+            - (float)Math.Truncate(this.anEnemy.GetCurrentAnimatorStateInfo(0).normalizedTime);
 
+        if (    (fFractionThroughAttackClip >= fFractionThroughAttackClipDamagePhaseStart)
+            &&  (fFractionThroughAttackClip <= fFractionThroughAttackClipDamagePhaseEnd) )
+        {
+            if (!bAttackInDamagePhase)
+            {
+                bAttackInDamagePhase = true;
+            }
+            return;
+        }
+
+        if (bAttackInDamagePhase)
+        {
+            bAttackInDamagePhase = false;
+        }
     }
 
     // ------------------------------------------------------------------------------------------------
