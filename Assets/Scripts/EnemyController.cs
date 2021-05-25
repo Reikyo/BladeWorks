@@ -7,24 +7,29 @@ using UnityEngine.UI;
 public class EnemyController : MonoBehaviour
 {
     private float fMetresPerSecWalk = 2f;
-    public float fHealth;
-    private float fHealthMax = 100f;
+    private int iHealthMax = 100;
+    public int iHealth;
+    private bool bAlive;
     public Slider sliHealth;
     private Animator anEnemy;
+    // private AnimatorClipInfo[] aninfoEnemy;
     private NavMeshAgent navEnemy;
     private GameObject goPlayer;
+    private PlayerController playerController;
 
     // ------------------------------------------------------------------------------------------------
 
     // Start is called before the first frame update
     void Start()
     {
-        fHealth = fHealthMax;
-        sliHealth.value = fHealth;
-
         anEnemy = GetComponent<Animator>();
         navEnemy = GetComponent<NavMeshAgent>();
         goPlayer = GameObject.FindWithTag("Player");
+        playerController = goPlayer.GetComponent<PlayerController>();
+
+        iHealth = iHealthMax;
+        bAlive = iHealth > 0;
+        sliHealth.value = iHealth;
     }
 
     // ------------------------------------------------------------------------------------------------
@@ -34,33 +39,82 @@ public class EnemyController : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.E))
         {
-            Debug.Log("Enemy hit");
-            fHealth -= 10f;
-            if (fHealth >= sliHealth.minValue)
+            Attacked(10);
+        }
+
+        if (!playerController.bAlive)
+        {
+            if (navEnemy.enabled)
             {
-                sliHealth.value = fHealth;
+                navEnemy.enabled = false;
             }
-            if (fHealth <= 0f)
+            if (!anEnemy.GetBool("bTrgVictory"))
             {
-                fHealth = 0f;
-                sliHealth.transform.Find("Fill Area").gameObject.SetActive(false);
+                anEnemy.SetTrigger("trgVictory");
+                anEnemy.SetBool("bTrgVictory", true);
             }
+            if (anEnemy.GetBool("bMotionWalk"))
+            {
+                anEnemy.SetBool("bMotionWalk", false);
+            }
+            return;
         }
 
         navEnemy.destination = goPlayer.transform.position;
 
         if (navEnemy.remainingDistance > navEnemy.stoppingDistance)
         {
-            anEnemy.SetBool("bMotionWalk", true);
+            if (!anEnemy.GetBool("bMotionWalk"))
+            {
+                anEnemy.SetBool("bMotionWalk", true);
+            }
+            return;
         }
-        else
+
+        if (!anEnemy.GetBool("bTrgAttack") && (this.anEnemy.GetCurrentAnimatorClipInfo(0)[0].clip.name != "Attack01"))
         {
+            if (anEnemy.GetBool("bMotionWalk"))
+            {
+                anEnemy.SetBool("bMotionWalk", false);
+            }
             transform.LookAt(
                 goPlayer.transform.position
                 - 0.5f * transform.right
             );
-            anEnemy.SetBool("bMotionWalk", false);
             anEnemy.SetTrigger("trgAttack");
+            anEnemy.SetBool("bTrgAttack", true);
+        }
+        else if (anEnemy.GetBool("bTrgAttack") && (this.anEnemy.GetCurrentAnimatorClipInfo(0)[0].clip.name == "Attack01"))
+        {
+            anEnemy.SetBool("bTrgAttack", false);
+        }
+
+        // aninfoEnemy = this.anEnemy.GetCurrentAnimatorClipInfo(0);
+        // Debug.Log(aninfoEnemy[0].clip.name);
+
+    }
+
+    // ------------------------------------------------------------------------------------------------
+
+    public void Attacked(int iDamage)
+    {
+        if ((iHealth == 0) || (iDamage <= 0))
+        {
+            return;
+        }
+        if (iHealth > iDamage)
+        {
+            Debug.Log("Enemy hit");
+            iHealth -= iDamage;
+            sliHealth.value = iHealth;
+            anEnemy.SetTrigger("trgAttacked");
+        }
+        else
+        {
+            iHealth = 0;
+            bAlive = false;
+            sliHealth.transform.Find("Fill Area").gameObject.SetActive(false);
+            gameObject.GetComponent<EnemyController>().enabled = false; // This line disables this script!
         }
     }
 

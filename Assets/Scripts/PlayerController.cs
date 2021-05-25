@@ -19,8 +19,8 @@ public class PlayerController : MonoBehaviour
     public Animator[] anPlayerChildren;
     private float fSpeedAnPlayerChild;
     private int iHealthMax = 100;
-    private int iHealth;
-    private bool bAlive;
+    public int iHealth;
+    public bool bAlive;
     public Slider sliHealth;
 
     // private CharacterController ccPlayer;
@@ -37,6 +37,7 @@ public class PlayerController : MonoBehaviour
         rbPlayer = GetComponent<Rigidbody>();
         anPlayer = GetComponent<Animator>();
         anPlayerChildren = GetComponentsInChildren<Animator>(); // n.b. This only gets the component of the first child in the tree
+
         iHealth = iHealthMax;
         bAlive = iHealth > 0;
         sliHealth.value = iHealth;
@@ -156,7 +157,7 @@ public class PlayerController : MonoBehaviour
 
     public void Attacked(int iDamage)
     {
-        if (iDamage <= 0)
+        if ((iHealth == 0) || (iDamage <= 0))
         {
             return;
         }
@@ -170,7 +171,7 @@ public class PlayerController : MonoBehaviour
                 anPlayerChild.SetTrigger("trgAttacked");
             }
         }
-        else if (iHealth > 0)
+        else
         {
             iHealth = 0;
             bAlive = false;
