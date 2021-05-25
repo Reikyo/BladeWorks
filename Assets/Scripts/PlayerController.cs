@@ -17,6 +17,11 @@ public class PlayerController : MonoBehaviour
     private Rigidbody rbPlayer;
     private Animator anPlayer;
     public Animator[] anPlayerChildren;
+    public int iDamage = 20;
+    private float fFractionThroughAttackClip;
+    private float fFractionThroughAttackClipDamagePhaseStart = 0.30f;
+    private float fFractionThroughAttackClipDamagePhaseEnd = 0.60f;
+    public bool bAttackInDamagePhase = false;
     private float fSpeedAnPlayerChild;
     private int iHealthMax = 100;
     public int iHealth;
@@ -56,9 +61,12 @@ public class PlayerController : MonoBehaviour
 
     // ------------------------------------------------------------------------------------------------
 
-    // FixedUpdate is called once per frame
+    // FixedUpdate may be called more or less than once per frame, depending on the frame rate
     void FixedUpdate()
     {
+
+        // ------------------------------------------------------------------------------------------------
+
         fInputHorz = Input.GetAxis("Horizontal");
         fInputVert = Input.GetAxis("Vertical");
 
@@ -112,21 +120,6 @@ public class PlayerController : MonoBehaviour
 
         // ------------------------------------------------------------------------------------------------
 
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            rbPlayer.AddForce(fForceJump * Vector3.up, ForceMode.Impulse);
-        }
-
-        if (Input.GetKeyDown(KeyCode.Return))
-        {
-            // anPlayer.SetBool("bAttack", true);
-            foreach (Animator anPlayerChild in anPlayerChildren)
-            {
-                anPlayerChild.SetTrigger("trgAttack");
-            }
-            // StartCoroutine(Wait());
-        }
-
         // if (ccPlayer.isGrounded)
         // {
         //     if (Input.GetKeyDown(KeyCode.Space))
@@ -139,6 +132,53 @@ public class PlayerController : MonoBehaviour
         //     v3DirectionMoveJump.y -= gravity * Time.deltaTime;
         //     ccPlayer.Move(v3DirectionMoveJump * Time.deltaTime);
         // }
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            rbPlayer.AddForce(fForceJump * Vector3.up, ForceMode.Impulse);
+        }
+
+        // ------------------------------------------------------------------------------------------------
+
+        if (this.anPlayer.GetCurrentAnimatorClipInfo(0)[0].clip.name != "Berserker_attack_03")
+        {
+            if (    (Input.GetKeyDown(KeyCode.Return))
+                &&  (!anPlayer.GetBool("bTrgAttack")) )
+            {
+                foreach (Animator anPlayerChild in anPlayerChildren)
+                {
+                    anPlayerChild.SetTrigger("trgAttack");
+                }
+                anPlayer.SetBool("bTrgAttack", true);
+            }
+            return;
+        }
+
+        if (anPlayer.GetBool("bTrgAttack"))
+        {
+            anPlayer.SetBool("bTrgAttack", false);
+        }
+
+        fFractionThroughAttackClip =
+            this.anPlayer.GetCurrentAnimatorStateInfo(0).normalizedTime
+            - (float)Math.Truncate(this.anPlayer.GetCurrentAnimatorStateInfo(0).normalizedTime);
+
+        if (    (fFractionThroughAttackClip >= fFractionThroughAttackClipDamagePhaseStart)
+            &&  (fFractionThroughAttackClip <= fFractionThroughAttackClipDamagePhaseEnd) )
+        {
+            if (!bAttackInDamagePhase)
+            {
+                bAttackInDamagePhase = true;
+            }
+            return;
+        }
+
+        if (bAttackInDamagePhase)
+        {
+            bAttackInDamagePhase = false;
+        }
+
+        // ------------------------------------------------------------------------------------------------
 
     }
 
@@ -182,6 +222,8 @@ public class PlayerController : MonoBehaviour
             }
             gameObject.GetComponent<PlayerController>().enabled = false; // This line disables this script!
         }
+        anPlayer.SetBool("bTrgAttack", false);
+        bAttackInDamagePhase = false;
     }
 
     // ------------------------------------------------------------------------------------------------

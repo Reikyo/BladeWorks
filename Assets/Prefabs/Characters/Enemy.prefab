@@ -683,7 +683,7 @@ GameObject:
   - component: {fileID: 3200318080285493911}
   m_Layer: 0
   m_Name: Enemy
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -753,7 +753,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 112
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
 --- !u!114 &796047671637413
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -769,7 +769,8 @@ MonoBehaviour:
   iHealth: 0
   bAlive: 0
   sliHealth: {fileID: 3467364804778161904}
-  bAttackDoesDamage: 0
+  iDamage: 10
+  bAttackInDamagePhase: 0
 --- !u!195 &3200318080285493911
 NavMeshAgent:
   m_ObjectHideFlags: 0

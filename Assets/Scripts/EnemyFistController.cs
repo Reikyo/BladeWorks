@@ -4,9 +4,7 @@ using UnityEngine;
 
 public class EnemyFistController : MonoBehaviour
 {
-    private GameObject goPlayer;
     public GameObject goEnemy;
-    private PlayerController playerController;
     private EnemyController enemyController;
 
     // ------------------------------------------------------------------------------------------------
@@ -14,8 +12,6 @@ public class EnemyFistController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        goPlayer = GameObject.FindWithTag("Player");
-        playerController = goPlayer.GetComponent<PlayerController>();
         enemyController = goEnemy.GetComponent<EnemyController>();
     }
 
@@ -26,7 +22,7 @@ public class EnemyFistController : MonoBehaviour
         if (    (enemyController.bAttackInDamagePhase)
             &&  (collider.gameObject.CompareTag("Player")) )
         {
-            playerController.Attacked(10);
+            collider.gameObject.GetComponent<PlayerController>().Attacked(enemyController.iDamage);
         }
     }
 

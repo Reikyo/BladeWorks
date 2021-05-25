@@ -13,9 +13,10 @@ public class EnemyController : MonoBehaviour
     public bool bAlive;
     public Slider sliHealth;
     private Animator anEnemy;
+    public int iDamage = 10;
     private float fFractionThroughAttackClip;
     private float fFractionThroughAttackClipDamagePhaseStart = 0.50f;
-    private float fFractionThroughAttackClipDamagePhaseEnd = 0.75f;
+    private float fFractionThroughAttackClipDamagePhaseEnd = 0.90f;
     public bool bAttackInDamagePhase = false;
     private NavMeshAgent navEnemy;
     private GameObject goPlayer;
@@ -41,10 +42,15 @@ public class EnemyController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+
+        // ------------------------------------------------------------------------------------------------
+
         if (Input.GetKeyDown(KeyCode.E))
         {
             Attacked(10);
         }
+
+        // ------------------------------------------------------------------------------------------------
 
         if (!playerController.bAlive)
         {
@@ -64,6 +70,8 @@ public class EnemyController : MonoBehaviour
             return;
         }
 
+        // ------------------------------------------------------------------------------------------------
+
         navEnemy.destination = goPlayer.transform.position;
 
         if (navEnemy.remainingDistance > navEnemy.stoppingDistance)
@@ -74,6 +82,8 @@ public class EnemyController : MonoBehaviour
             }
             return;
         }
+
+        // ------------------------------------------------------------------------------------------------
 
         if (this.anEnemy.GetCurrentAnimatorClipInfo(0)[0].clip.name != "Attack01")
         {
@@ -116,6 +126,9 @@ public class EnemyController : MonoBehaviour
         {
             bAttackInDamagePhase = false;
         }
+
+        // ------------------------------------------------------------------------------------------------
+
     }
 
     // ------------------------------------------------------------------------------------------------
@@ -138,8 +151,11 @@ public class EnemyController : MonoBehaviour
             iHealth = 0;
             bAlive = false;
             sliHealth.transform.Find("Fill Area").gameObject.SetActive(false);
+            anEnemy.SetTrigger("trgKilled");
             gameObject.GetComponent<EnemyController>().enabled = false; // This line disables this script!
         }
+        anEnemy.SetBool("bTrgAttack", false);
+        bAttackInDamagePhase = false;
     }
 
     // ------------------------------------------------------------------------------------------------
