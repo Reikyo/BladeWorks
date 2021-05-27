@@ -706,7 +706,7 @@ GameObject:
   - component: {fileID: 563386137}
   m_Layer: 0
   m_Name: Terrain
-  m_TagString: Untagged
+  m_TagString: Surface
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
@@ -1152,6 +1152,10 @@ PrefabInstance:
       propertyPath: sliHealth
       value: 
       objectReference: {fileID: 510748151}
+    - target: {fileID: 1848372169, guid: 9bc976cb83b4c42559f130d62138c0c1, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1484473302035160917, guid: 9bc976cb83b4c42559f130d62138c0c1,
         type: 3}
       propertyPath: m_Name

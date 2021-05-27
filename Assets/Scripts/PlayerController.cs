@@ -6,10 +6,14 @@ using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
-    private bool bInMotionLastFrame = false;
-    private bool bInMotionThisFrame = false;
+    private bool bInMotion = false;
+    private bool bAnimateWalkThisFrame = false;
+    private bool bAnimateWalkLastFrame = false;
     private float fMetresPerSecWalk = 5f;
-    private float fForceJump = 70f;
+    private float fForceJump = 300f;
+    private bool bOnSurface = true;
+    private float fTimeTrgJump = 0f;
+    private float fTimeTrgJumpDelay = 0.1f;
     private float fInputHorz;
     private float fInputVert;
     private Vector3 v3DirectionMove;
@@ -28,6 +32,7 @@ public class PlayerController : MonoBehaviour
     public bool bAlive;
     public Slider sliHealth;
     private Camera camMainCamera;
+    private RaycastHit rayHitSurface;
 
     // private CharacterController ccPlayer;
     // private float jumpSpeed = 2f;
@@ -69,6 +74,10 @@ public class PlayerController : MonoBehaviour
 
         // ------------------------------------------------------------------------------------------------
 
+        bOnSurface = Physics.Raycast(transform.position + 0.2f * Vector3.up, -Vector3.up, out rayHitSurface, 0.21f);
+
+        // ------------------------------------------------------------------------------------------------
+
         fInputHorz = Input.GetAxis("Horizontal");
         fInputVert = Input.GetAxis("Vertical");
 
@@ -76,8 +85,6 @@ public class PlayerController : MonoBehaviour
 
         if (Math.Abs(fInputHorz) + Math.Abs(fInputVert) > 0f)
         {
-            bInMotionThisFrame = true;
-
             // This is good for player control from a fixed camera angle in world space:
             // v3DirectionMove = ((fInputHorz * Vector3.right) + (fInputVert * Vector3.forward)).normalized;
 
@@ -94,37 +101,39 @@ public class PlayerController : MonoBehaviour
             transform.rotation = Quaternion.LookRotation(v3DirectionLook);
 
             // ccPlayer.Move(v3DirectionMove * fMetresPerSecWalk * Time.deltaTime);
+
+            bInMotion = true;
         }
         else
         {
-            bInMotionThisFrame = false;
+            bInMotion = false;
         }
 
         // ------------------------------------------------------------------------------------------------
 
-        if (bInMotionLastFrame != bInMotionThisFrame)
+        if (    bInMotion
+            &&  bOnSurface )
         {
-            // Debug.Log("Here");
-            if (bInMotionThisFrame)
-            {
-                fSpeedAnPlayerChild = 1f;
-            }
-            else
-            {
-                fSpeedAnPlayerChild = 0f;
-            }
+            bAnimateWalkThisFrame = true;
+            fSpeedAnPlayerChild = 1f;
+        }
+        else
+        {
+            bAnimateWalkThisFrame = false;
+            fSpeedAnPlayerChild = 0f;
+        }
+
+        if (bAnimateWalkThisFrame != bAnimateWalkLastFrame)
+        {
             // anPlayer.SetFloat("fSpeedAnPlayerChild", fSpeedAnPlayerChild);
-            // Only needed if the character model has multiple animated parts
+            // Only needed if the character model has multiple animated parts:
             foreach (Animator anPlayerChild in anPlayerChildren)
             {
                 anPlayerChild.SetFloat("fSpeedAnPlayerChild", fSpeedAnPlayerChild);
             }
-            // anPlayer.SetFloat("Speed_f", 0f);
         }
 
-        // ------------------------------------------------------------------------------------------------
-
-        bInMotionLastFrame = bInMotionThisFrame;
+        bAnimateWalkLastFrame = bAnimateWalkThisFrame;
 
         // ------------------------------------------------------------------------------------------------
 
@@ -142,8 +151,11 @@ public class PlayerController : MonoBehaviour
         // }
 
         // if (Input.GetKeyDown(KeyCode.Space))
-        if (Input.GetButtonDown("Jump"))
+        if (    Input.GetButtonDown("Jump")
+            &&  bOnSurface
+            &&  (Time.time - fTimeTrgJump >= fTimeTrgJumpDelay) )
         {
+            fTimeTrgJump = Time.time;
             rbPlayer.AddForce(fForceJump * Vector3.up, ForceMode.Impulse);
         }
 
