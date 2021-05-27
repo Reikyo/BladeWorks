@@ -27,6 +27,7 @@ public class PlayerController : MonoBehaviour
     public int iHealth;
     public bool bAlive;
     public Slider sliHealth;
+    private Camera camMainCamera;
 
     // private CharacterController ccPlayer;
     // private float jumpSpeed = 2f;
@@ -42,6 +43,7 @@ public class PlayerController : MonoBehaviour
         rbPlayer = GetComponent<Rigidbody>();
         anPlayer = GetComponent<Animator>();
         anPlayerChildren = GetComponentsInChildren<Animator>(); // n.b. This only gets the component of the first child in the tree
+        camMainCamera = GameObject.Find("Main Camera").GetComponent<Camera>();
 
         iHealth = iHealthMax;
         bAlive = iHealth > 0;
@@ -70,6 +72,8 @@ public class PlayerController : MonoBehaviour
         fInputHorz = Input.GetAxis("Horizontal");
         fInputVert = Input.GetAxis("Vertical");
 
+        // Debug.Log(string.Format("Horz:{0} Vert:{1}", fInputHorz, fInputVert));
+
         if (Math.Abs(fInputHorz) + Math.Abs(fInputVert) > 0f)
         {
             bInMotionThisFrame = true;
@@ -78,7 +82,11 @@ public class PlayerController : MonoBehaviour
             // v3DirectionMove = ((fInputHorz * Vector3.right) + (fInputVert * Vector3.forward)).normalized;
 
             // This is good for player control from a fixed camera angle in local space:
-            v3DirectionMove = ((fInputHorz * transform.right) + (fInputVert * transform.forward)).normalized;
+            // v3DirectionMove = ((fInputHorz * transform.right) + (fInputVert * transform.forward)).normalized;
+
+            // This is good for player control from a variable camera angle in local space. Motion is wrt to
+            // the camera, not the player, but the player look direction is still wrt to the player, not the camera:
+            v3DirectionMove = ((fInputHorz * camMainCamera.transform.right) + (fInputVert * camMainCamera.transform.forward)).normalized;
 
             v3DirectionLook = Vector3.RotateTowards(transform.forward, v3DirectionMove, fMetresPerSecWalk * Time.deltaTime, 0f);
 
@@ -133,7 +141,8 @@ public class PlayerController : MonoBehaviour
         //     ccPlayer.Move(v3DirectionMoveJump * Time.deltaTime);
         // }
 
-        if (Input.GetKeyDown(KeyCode.Space))
+        // if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetButtonDown("Jump"))
         {
             rbPlayer.AddForce(fForceJump * Vector3.up, ForceMode.Impulse);
         }
@@ -142,7 +151,8 @@ public class PlayerController : MonoBehaviour
 
         if (this.anPlayer.GetCurrentAnimatorClipInfo(0)[0].clip.name != "Berserker_attack_03")
         {
-            if (    (Input.GetKeyDown(KeyCode.Return))
+            // if (    (Input.GetKeyDown(KeyCode.Return))
+            if (    (Input.GetButtonDown("Attack1"))
                 &&  (!anPlayer.GetBool("bTrgAttack")) )
             {
                 foreach (Animator anPlayerChild in anPlayerChildren)
