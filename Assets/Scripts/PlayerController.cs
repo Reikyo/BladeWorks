@@ -22,8 +22,8 @@ public class PlayerController : MonoBehaviour
     private Animator anPlayer;
     public Animator[] anPlayerChildren;
     public int iDamage = 20;
-    private List<string> sListAnimatorClipNameAttack = new List<string>() {"Berserker_attack_01", "Berserker_attack_02", "Berserker_attack_03"};
-    private string sTrgAttack;
+    private List<string> sListAnimatorClipNameAction = new List<string>() {"Berserker_dodge_01", "Berserker_attack_01", "Berserker_attack_02", "Berserker_attack_03"};
+    private string sTrgAction;
     private float fFractionThroughAttackClip;
     private float fFractionThroughAttackClipDamagePhaseStart = 0.30f;
     private float fFractionThroughAttackClipDamagePhaseEnd = 0.60f;
@@ -162,38 +162,51 @@ public class PlayerController : MonoBehaviour
 
         // ------------------------------------------------------------------------------------------------
 
-        if (!sListAnimatorClipNameAttack.Contains(this.anPlayer.GetCurrentAnimatorClipInfo(0)[0].clip.name))
+        if (!sListAnimatorClipNameAction.Contains(this.anPlayer.GetCurrentAnimatorClipInfo(0)[0].clip.name))
         {
-            if (!anPlayer.GetBool("bTrgAttack"))
+            if (anPlayer.GetBool("bTrgAction"))
             {
-                if (Input.GetButtonDown("Attack1")) // Joystick button 2 = PS4 circle button
-                {
-                    sTrgAttack = "trgAttack1";
-                }
-                else if (Input.GetButtonDown("Attack2")) // Joystick button 3 = PS4 triangle button
-                {
-                    sTrgAttack = "trgAttack2";
-                }
-                else if (Input.GetButtonDown("Attack3")) // Joystick button 0 = PS4 square button
-                {
-                    sTrgAttack = "trgAttack3";
-                }
-                else
-                {
-                    return;
-                }
-                foreach (Animator anPlayerChild in anPlayerChildren)
-                {
-                    anPlayerChild.SetTrigger(sTrgAttack);
-                }
-                anPlayer.SetBool("bTrgAttack", true);
+                return;
             }
-            return;
+
+            if (    Input.GetButtonDown("Dodge") // Joystick button 2 = PS4 circle button
+                &&  bOnSurface )
+            {
+                sTrgAction = "trgDodge";
+            }
+            // if (Input.GetButtonDown("Attack1")) // Joystick button 2 = PS4 circle button
+            // {
+            //     sTrgAction = "trgAttack1";
+            // }
+            else if (Input.GetButtonDown("Attack2")) // Joystick button 3 = PS4 triangle button
+            {
+                sTrgAction = "trgAttack2";
+            }
+            else if (Input.GetButtonDown("Attack3")) // Joystick button 0 = PS4 square button
+            {
+                sTrgAction = "trgAttack3";
+            }
+            else
+            {
+                return;
+            }
+
+            foreach (Animator anPlayerChild in anPlayerChildren)
+            {
+                anPlayerChild.SetTrigger(sTrgAction);
+            }
+
+            anPlayer.SetBool("bTrgAction", true);
         }
 
-        if (anPlayer.GetBool("bTrgAttack"))
+        if (anPlayer.GetBool("bTrgAction"))
         {
-            anPlayer.SetBool("bTrgAttack", false);
+            anPlayer.SetBool("bTrgAction", false);
+        }
+
+        if (this.anPlayer.GetCurrentAnimatorClipInfo(0)[0].clip.name == "Berserker_dodge_01")
+        {
+            return;
         }
 
         fFractionThroughAttackClip =
@@ -259,7 +272,7 @@ public class PlayerController : MonoBehaviour
             }
             gameObject.GetComponent<PlayerController>().enabled = false; // This line disables this script!
         }
-        anPlayer.SetBool("bTrgAttack", false);
+        anPlayer.SetBool("bTrgAction", false);
         bAttackInDamagePhase = false;
     }
 
