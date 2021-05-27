@@ -22,6 +22,8 @@ public class PlayerController : MonoBehaviour
     private Animator anPlayer;
     public Animator[] anPlayerChildren;
     public int iDamage = 20;
+    private List<string> sListAnimatorClipNameAttack = new List<string>() {"Berserker_attack_01", "Berserker_attack_02", "Berserker_attack_03"};
+    private string sTrgAttack;
     private float fFractionThroughAttackClip;
     private float fFractionThroughAttackClipDamagePhaseStart = 0.30f;
     private float fFractionThroughAttackClipDamagePhaseEnd = 0.60f;
@@ -150,8 +152,7 @@ public class PlayerController : MonoBehaviour
         //     ccPlayer.Move(v3DirectionMoveJump * Time.deltaTime);
         // }
 
-        // if (Input.GetKeyDown(KeyCode.Space))
-        if (    Input.GetButtonDown("Jump")
+        if (    Input.GetButtonDown("Jump") // Joystick button 1 = PS4 X button
             &&  bOnSurface
             &&  (Time.time - fTimeTrgJump >= fTimeTrgJumpDelay) )
         {
@@ -161,15 +162,29 @@ public class PlayerController : MonoBehaviour
 
         // ------------------------------------------------------------------------------------------------
 
-        if (this.anPlayer.GetCurrentAnimatorClipInfo(0)[0].clip.name != "Berserker_attack_03")
+        if (!sListAnimatorClipNameAttack.Contains(this.anPlayer.GetCurrentAnimatorClipInfo(0)[0].clip.name))
         {
-            // if (    (Input.GetKeyDown(KeyCode.Return))
-            if (    (Input.GetButtonDown("Attack1"))
-                &&  (!anPlayer.GetBool("bTrgAttack")) )
+            if (!anPlayer.GetBool("bTrgAttack"))
             {
+                if (Input.GetButtonDown("Attack1")) // Joystick button 2 = PS4 circle button
+                {
+                    sTrgAttack = "trgAttack1";
+                }
+                else if (Input.GetButtonDown("Attack2")) // Joystick button 3 = PS4 triangle button
+                {
+                    sTrgAttack = "trgAttack2";
+                }
+                else if (Input.GetButtonDown("Attack3")) // Joystick button 0 = PS4 square button
+                {
+                    sTrgAttack = "trgAttack3";
+                }
+                else
+                {
+                    return;
+                }
                 foreach (Animator anPlayerChild in anPlayerChildren)
                 {
-                    anPlayerChild.SetTrigger("trgAttack");
+                    anPlayerChild.SetTrigger(sTrgAttack);
                 }
                 anPlayer.SetBool("bTrgAttack", true);
             }
