@@ -19,6 +19,12 @@ public class EnemyFistController : MonoBehaviour
 
     private void OnTriggerEnter(Collider collider)
     {
+        // if (collider.gameObject.CompareTag("Player"))
+        // {
+        //     Debug.Log(enemyController.sTrgAction);
+        //     Debug.Log(enemyController.fFractionThroughAttackClip);
+        //     Debug.Log("");
+        // }
         if (    (enemyController.bAttackInDamagePhase)
             &&  (collider.gameObject.CompareTag("Player")) )
         {

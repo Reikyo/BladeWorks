@@ -197,6 +197,7 @@ public class PlayerController : MonoBehaviour
             }
 
             anPlayer.SetBool("bTrgAction", true);
+            return;
         }
 
         if (anPlayer.GetBool("bTrgAction"))

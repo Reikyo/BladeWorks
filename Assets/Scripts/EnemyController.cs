@@ -14,10 +14,14 @@ public class EnemyController : MonoBehaviour
     public Slider sliHealth;
     private Animator anEnemy;
     public int iDamage = 10;
+    private List<string> sListAnimatorClipNameAction = new List<string>() {"Attack01", "Attack02"};
+    private string sTrgAction;
+    private bool bMirrorAction;
     private float fFractionThroughAttackClip;
-    private float fFractionThroughAttackClipDamagePhaseStart = 0.50f;
-    private float fFractionThroughAttackClipDamagePhaseEnd = 0.90f;
+    private float fFractionThroughAttackClipDamagePhaseStart;
+    private float fFractionThroughAttackClipDamagePhaseEnd;
     public bool bAttackInDamagePhase = false;
+    private float fLookAtOffsetAttack;
     private NavMeshAgent navEnemy;
     private GameObject goPlayer;
     private PlayerController playerController;
@@ -85,27 +89,78 @@ public class EnemyController : MonoBehaviour
 
         // ------------------------------------------------------------------------------------------------
 
-        if (this.anEnemy.GetCurrentAnimatorClipInfo(0)[0].clip.name != "Attack01")
+        if (!sListAnimatorClipNameAction.Contains(this.anEnemy.GetCurrentAnimatorClipInfo(0)[0].clip.name))
         {
-            if (!anEnemy.GetBool("bTrgAttack"))
+            if (anEnemy.GetBool("bTrgAction"))
             {
-                if (anEnemy.GetBool("bMotionWalk"))
-                {
-                    anEnemy.SetBool("bMotionWalk", false);
-                }
-                transform.LookAt(
-                    goPlayer.transform.position
-                    - 0.5f * transform.right
-                );
-                anEnemy.SetTrigger("trgAttack");
-                anEnemy.SetBool("bTrgAttack", true);
+                return;
             }
+
+            if (anEnemy.GetBool("bMotionWalk"))
+            {
+                anEnemy.SetBool("bMotionWalk", false);
+            }
+
+            bool bMirrorAction = (UnityEngine.Random.Range(0,2) == 0);
+
+            if (UnityEngine.Random.Range(0,2) == 0)
+            {
+                sTrgAction = "trgAttack1";
+                if (!bMirrorAction)
+                {
+                    fLookAtOffsetAttack = -0.5f;
+                    // Approximate fractional collision time is 0.64
+                    fFractionThroughAttackClipDamagePhaseStart = 0.54f;
+                    fFractionThroughAttackClipDamagePhaseEnd = 0.74f;
+                }
+                else
+                {
+                    fLookAtOffsetAttack = 0.5f;
+                    // Approximate fractional collision time is 0.11
+                    fFractionThroughAttackClipDamagePhaseStart = 0.01f;
+                    fFractionThroughAttackClipDamagePhaseEnd = 0.21f;
+                }
+            }
+            else
+            {
+                sTrgAction = "trgAttack2";
+                if (!bMirrorAction)
+                {
+                    fLookAtOffsetAttack = 1f;
+                    // Approximate fractional collision time is 0.45
+                    fFractionThroughAttackClipDamagePhaseStart = 0.35f;
+                    fFractionThroughAttackClipDamagePhaseEnd = 0.55f;
+                }
+                else
+                {
+                    fLookAtOffsetAttack = -1f;
+                    // Approximate fractional collision time is 0.95
+                    fFractionThroughAttackClipDamagePhaseStart = 0.85f;
+                    fFractionThroughAttackClipDamagePhaseEnd = 1.00f;
+                }
+            }
+
+            // bMirrorAction = true;
+            // sTrgAction = "trgAttack2";
+            // fLookAtOffsetAttack = -1f;
+            // // Approximate fractional collision time is 0.95
+            // fFractionThroughAttackClipDamagePhaseStart = 0.85f;
+            // fFractionThroughAttackClipDamagePhaseEnd = 1.00f;
+
+            transform.LookAt(
+                goPlayer.transform.position
+                + fLookAtOffsetAttack * transform.right
+            );
+
+            anEnemy.SetTrigger(sTrgAction);
+            anEnemy.SetBool("bTrgAction", true);
+            anEnemy.SetBool("bMirrorAction", bMirrorAction);
             return;
         }
 
-        if (anEnemy.GetBool("bTrgAttack"))
+        if (anEnemy.GetBool("bTrgAction"))
         {
-            anEnemy.SetBool("bTrgAttack", false);
+            anEnemy.SetBool("bTrgAction", false);
         }
 
         fFractionThroughAttackClip =
@@ -154,7 +209,7 @@ public class EnemyController : MonoBehaviour
             anEnemy.SetTrigger("trgKilled");
             gameObject.GetComponent<EnemyController>().enabled = false; // This line disables this script!
         }
-        anEnemy.SetBool("bTrgAttack", false);
+        anEnemy.SetBool("bTrgAction", false);
         bAttackInDamagePhase = false;
     }
 
