@@ -7,7 +7,9 @@ public class CameraController : MonoBehaviour
 {
     private float fInputHorz;
     private float fInputVert;
+    private Vector3 v3PosBeforeRotation;
     private Vector3 v3PosOffset;
+    private Vector3 v3LookAt;
     public float fPosOffsetRight = 0f;
     public float fPosOffsetForward = -5f;
     public float fPosOffsetUp = 2f;
@@ -45,18 +47,35 @@ public class CameraController : MonoBehaviour
             goPlayer.transform.position
             + v3PosOffset;
 
-        if (Math.Abs(fInputHorz) > 0f)
-        {
-            transform.RotateAround(goPlayer.transform.position, Vector3.up, fInputHorz * -50f * Time.deltaTime);
-            v3PosOffset = transform.position - goPlayer.transform.position;
-        }
-
-        transform.LookAt(
+        v3LookAt =
             goPlayer.transform.position
             + fLookAtOffsetRight * goPlayer.transform.right
             + fLookAtOffsetForward * goPlayer.transform.forward
-            + fLookAtOffsetUp * goPlayer.transform.up
-        );
+            + fLookAtOffsetUp * goPlayer.transform.up;
+
+        if (Math.Abs(fInputHorz) > 0f)
+        {
+            transform.RotateAround(v3LookAt, Vector3.up, fInputHorz * -50f * Time.deltaTime);
+            v3PosOffset = transform.position - goPlayer.transform.position;
+        }
+
+        if (    (fInputVert < 0f && transform.position.y > 0.3f)
+            ||  (fInputVert > 0f && transform.position.y < 3f) )
+        {
+            v3PosBeforeRotation = transform.position;
+            transform.RotateAround(v3LookAt, transform.right, fInputVert * 50f * Time.deltaTime);
+            if (    (transform.position.y < 0.3f)
+                ||  (transform.position.y > 3f) )
+            {
+                transform.position = v3PosBeforeRotation;
+            }
+            else
+            {
+                v3PosOffset = transform.position - goPlayer.transform.position;
+            }
+        }
+
+        transform.LookAt(v3LookAt);
     }
 
     // ------------------------------------------------------------------------------------------------
