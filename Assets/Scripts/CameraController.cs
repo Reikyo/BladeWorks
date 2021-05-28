@@ -5,17 +5,21 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
+    private Vector3 v3PosBeforeRotVert;
+    private Vector3 v3PosWRTPlayer;
+    private Vector3 v3LookAt;
+    private Vector3 v3LookAtWRTPlayer;
+    public float fPosWRTPlayerRight = 0f;
+    public float fPosWRTPlayerForward = -5f;
+    public float fPosWRTPlayerUp = 2f;
+    public float fLookAtWRTPlayerRight = 0f;
+    public float fLookAtWRTPlayerForward = 0f;
+    public float fLookAtWRTPlayerUp = 2f;
+    public float fPosYLower = 0.3f;
+    public float fPosYUpper = 3f;
+    public float fDegPerSec = 50f;
     private float fInputHorz;
     private float fInputVert;
-    private Vector3 v3PosBeforeRotation;
-    private Vector3 v3PosOffset;
-    private Vector3 v3LookAt;
-    public float fPosOffsetRight = 0f;
-    public float fPosOffsetForward = -5f;
-    public float fPosOffsetUp = 2f;
-    public float fLookAtOffsetRight = 0f;
-    public float fLookAtOffsetForward = 0f;
-    public float fLookAtOffsetUp = 2f;
     private GameObject goPlayer;
 
     // ------------------------------------------------------------------------------------------------
@@ -24,13 +28,14 @@ public class CameraController : MonoBehaviour
     void Start()
     {
         goPlayer = GameObject.FindWithTag("Player");
-        v3PosOffset =
-            fPosOffsetRight * goPlayer.transform.right
-            + fPosOffsetForward * goPlayer.transform.forward
-            + fPosOffsetUp * goPlayer.transform.up;
-        transform.position =
-            goPlayer.transform.position
-            + v3PosOffset;
+        v3PosWRTPlayer =
+            fPosWRTPlayerRight * goPlayer.transform.right
+            + fPosWRTPlayerForward * goPlayer.transform.forward
+            + fPosWRTPlayerUp * goPlayer.transform.up;
+        v3LookAtWRTPlayer =
+            fLookAtWRTPlayerRight * goPlayer.transform.right
+            + fLookAtWRTPlayerForward * goPlayer.transform.forward
+            + fLookAtWRTPlayerUp * goPlayer.transform.up;
     }
 
     // ------------------------------------------------------------------------------------------------
@@ -38,40 +43,37 @@ public class CameraController : MonoBehaviour
     // LateUpdate is called once per frame
     void LateUpdate()
     {
-        fInputHorz = Input.GetAxis("Horizontal Camera");
-        fInputVert = Input.GetAxis("Vertical Camera");
-
-        // Debug.Log(string.Format("Horz:{0} Vert:{1}", fInputHorz, fInputVert));
-
         transform.position =
             goPlayer.transform.position
-            + v3PosOffset;
+            + v3PosWRTPlayer;
 
         v3LookAt =
             goPlayer.transform.position
-            + fLookAtOffsetRight * goPlayer.transform.right
-            + fLookAtOffsetForward * goPlayer.transform.forward
-            + fLookAtOffsetUp * goPlayer.transform.up;
+            + v3LookAtWRTPlayer;
+
+        fInputHorz = Input.GetAxis("Horizontal Camera"); // Left is negative and right is positive (invert IS NOT enabled in project settings)
+        fInputVert = Input.GetAxis("Vertical Camera"); // Down is negative and up is positive (invert IS enabled in project settings)
+        // Debug.Log(string.Format("Horz:{0} Vert:{1}", fInputHorz, fInputVert));
 
         if (Math.Abs(fInputHorz) > 0f)
         {
-            transform.RotateAround(v3LookAt, Vector3.up, fInputHorz * -50f * Time.deltaTime);
-            v3PosOffset = transform.position - goPlayer.transform.position;
+            transform.RotateAround(goPlayer.transform.position, Vector3.up, fInputHorz * -fDegPerSec * Time.deltaTime);
+            v3PosWRTPlayer = transform.position - goPlayer.transform.position;
         }
 
-        if (    (fInputVert < 0f && transform.position.y > 0.3f)
-            ||  (fInputVert > 0f && transform.position.y < 3f) )
+        if (    (fInputVert < 0f && transform.position.y > fPosYLower)
+            ||  (fInputVert > 0f && transform.position.y < fPosYUpper) )
         {
-            v3PosBeforeRotation = transform.position;
-            transform.RotateAround(v3LookAt, transform.right, fInputVert * 50f * Time.deltaTime);
-            if (    (transform.position.y < 0.3f)
-                ||  (transform.position.y > 3f) )
+            v3PosBeforeRotVert = transform.position;
+            transform.RotateAround(goPlayer.transform.position, transform.right, fInputVert * fDegPerSec * Time.deltaTime);
+            if (    (transform.position.y < fPosYLower)
+                ||  (transform.position.y > fPosYUpper) )
             {
-                transform.position = v3PosBeforeRotation;
+                transform.position = v3PosBeforeRotVert;
             }
             else
             {
-                v3PosOffset = transform.position - goPlayer.transform.position;
+                v3PosWRTPlayer = transform.position - goPlayer.transform.position;
             }
         }
 

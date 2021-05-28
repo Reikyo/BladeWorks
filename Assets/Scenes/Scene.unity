@@ -417,12 +417,12 @@ PrefabInstance:
     - target: {fileID: 2411068623783801472, guid: efe251cbc70e84976ac45ca195ff10b1,
         type: 3}
       propertyPath: m_AnchorMax.x
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2411068623783801472, guid: efe251cbc70e84976ac45ca195ff10b1,
         type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4704326478208992929, guid: efe251cbc70e84976ac45ca195ff10b1,
         type: 3}
@@ -432,7 +432,7 @@ PrefabInstance:
     - target: {fileID: 4704326478208992929, guid: efe251cbc70e84976ac45ca195ff10b1,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4704326478208992931, guid: efe251cbc70e84976ac45ca195ff10b1,
         type: 3}
@@ -687,12 +687,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b05e42539b89049f2aec95fbb047751d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fPosOffsetRight: 0
-  fPosOffsetForward: -5
-  fPosOffsetUp: 2
-  fLookAtOffsetRight: 0
-  fLookAtOffsetForward: 0
-  fLookAtOffsetUp: 2
+  fPosWRTPlayerRight: 0
+  fPosWRTPlayerForward: -5
+  fPosWRTPlayerUp: 2
+  fLookAtWRTPlayerRight: 0
+  fLookAtWRTPlayerForward: 0
+  fLookAtWRTPlayerUp: 2
+  fPosYLower: 0.3
+  fPosYUpper: 3
+  fDegPerSec: 50
 --- !u!1 &563386136
 GameObject:
   m_ObjectHideFlags: 0
