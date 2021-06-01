@@ -45,6 +45,8 @@ public class EnemyController : MonoBehaviour
 
     // Update is called once per frame
     void Update()
+    // FixedUpdate may be called more or less than once per frame, depending on the frame rate
+    // void FixedUpdate()
     {
 
         // ------------------------------------------------------------------------------------------------
@@ -78,7 +80,14 @@ public class EnemyController : MonoBehaviour
 
         navEnemy.destination = goPlayer.transform.position;
 
-        if (navEnemy.remainingDistance > navEnemy.stoppingDistance)
+        // This commented line should work, and has been seen to work, but for some reason it doesn't
+        // always work, hence the manual calculation ...
+        // if (navEnemy.remainingDistance > navEnemy.stoppingDistance)
+        if (Math.Pow(
+                    Math.Pow(transform.position.x - navEnemy.destination.x, 2f)
+                +   Math.Pow(transform.position.z - navEnemy.destination.z, 2f),
+                0.5f
+            ) > navEnemy.stoppingDistance)
         {
             if (!anEnemy.GetBool("bMotionWalk"))
             {
