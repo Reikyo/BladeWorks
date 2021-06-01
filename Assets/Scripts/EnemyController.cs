@@ -7,20 +7,24 @@ using UnityEngine.UI;
 
 public class EnemyController : MonoBehaviour
 {
+    private GameManager gameManager;
+
+    public bool bAlive;
+    public bool bAttackInDamagePhase = false;
+    private bool bMirrorAction = false;
+    private bool bTrgSfx = false;
+
     private float fMetresPerSecWalk = 2f;
     private int iHealthMax = 100;
     public int iHealth;
-    public bool bAlive;
     public Slider sliHealth;
     private Animator anEnemy;
     public int iDamage = 10;
     private List<string> sListAnimatorClipNameAction = new List<string>() {"Attack01", "Attack02"};
     private string sTrgAction;
-    private bool bMirrorAction;
     private float fFractionThroughAttackClip;
     private float fFractionThroughAttackClipDamagePhaseStart;
     private float fFractionThroughAttackClipDamagePhaseEnd;
-    public bool bAttackInDamagePhase = false;
     private float fLookAtOffsetAttack;
     private NavMeshAgent navEnemy;
     private GameObject goPlayer;
@@ -31,6 +35,8 @@ public class EnemyController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        gameManager = GameObject.Find("Game Manager").GetComponent<GameManager>();
+
         anEnemy = GetComponent<Animator>();
         navEnemy = GetComponent<NavMeshAgent>();
         goPlayer = GameObject.FindWithTag("Player");
@@ -164,12 +170,26 @@ public class EnemyController : MonoBehaviour
             anEnemy.SetTrigger(sTrgAction);
             anEnemy.SetBool("bTrgAction", true);
             anEnemy.SetBool("bMirrorAction", bMirrorAction);
+            bTrgSfx = false;
             return;
         }
 
         if (anEnemy.GetBool("bTrgAction"))
         {
             anEnemy.SetBool("bTrgAction", false);
+        }
+
+        if (!bTrgSfx)
+        {
+            bTrgSfx = true;
+            if (UnityEngine.Random.Range(0,2) == 0)
+            {
+                gameManager.SfxclpPlay("sfxclpEnemyAttackSwipe1");
+            }
+            else
+            {
+                gameManager.SfxclpPlay("sfxclpEnemyAttackSwipe2");
+            }
         }
 
         fFractionThroughAttackClip =

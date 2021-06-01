@@ -6,12 +6,19 @@ using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
+    private GameManager gameManager;
+    private Camera camMainCamera;
+
+    public bool bAlive;
+    public bool bAttackInDamagePhase = false;
+    private bool bOnSurface = true;
     private bool bInMotion = false;
     private bool bAnimateWalkThisFrame = false;
     private bool bAnimateWalkLastFrame = false;
+    private bool bTrgSfx = false;
+
     private float fMetresPerSecWalk = 5f;
     private float fForceJump = 300f;
-    private bool bOnSurface = true;
     private float fTimeTrgJump = 0f;
     private float fTimeTrgJumpDelay = 0.1f;
     private float fInputHorz;
@@ -27,13 +34,10 @@ public class PlayerController : MonoBehaviour
     private float fFractionThroughAttackClip;
     private float fFractionThroughAttackClipDamagePhaseStart = 0.30f;
     private float fFractionThroughAttackClipDamagePhaseEnd = 0.60f;
-    public bool bAttackInDamagePhase = false;
     private float fSpeedAnPlayerChild;
     private int iHealthMax = 100;
     public int iHealth;
-    public bool bAlive;
     public Slider sliHealth;
-    private Camera camMainCamera;
     private RaycastHit rayHitSurface;
 
     // private CharacterController ccPlayer;
@@ -46,11 +50,13 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        gameManager = GameObject.Find("Game Manager").GetComponent<GameManager>();
+        camMainCamera = GameObject.Find("Main Camera").GetComponent<Camera>();
+
         // ccPlayer = GetComponent<CharacterController>();
         rbPlayer = GetComponent<Rigidbody>();
         anPlayer = GetComponent<Animator>();
         anPlayerChildren = GetComponentsInChildren<Animator>(); // n.b. This only gets the component of the first child in the tree
-        camMainCamera = GameObject.Find("Main Camera").GetComponent<Camera>();
 
         iHealth = iHealthMax;
         bAlive = iHealth > 0;
@@ -197,6 +203,7 @@ public class PlayerController : MonoBehaviour
             }
 
             anPlayer.SetBool("bTrgAction", true);
+            bTrgSfx = false;
             return;
         }
 
@@ -207,7 +214,25 @@ public class PlayerController : MonoBehaviour
 
         if (this.anPlayer.GetCurrentAnimatorClipInfo(0)[0].clip.name == "Berserker_dodge_01")
         {
+            if (!bTrgSfx)
+            {
+                bTrgSfx = true;
+                gameManager.SfxclpPlay("sfxclpPlayerDodge");
+            }
             return;
+        }
+
+        if (!bTrgSfx)
+        {
+            bTrgSfx = true;
+            if (UnityEngine.Random.Range(0,2) == 0)
+            {
+                gameManager.SfxclpPlay("sfxclpPlayerAttackSwipe1");
+            }
+            else
+            {
+                gameManager.SfxclpPlay("sfxclpPlayerAttackSwipe2");
+            }
         }
 
         fFractionThroughAttackClip =
@@ -288,7 +313,7 @@ public class PlayerController : MonoBehaviour
             if (iHealth < iHealthMax)
             {
                 Destroy(collider.gameObject);
-                // gameManager.SfxclpPlay("sfxclpPowerUp");
+                gameManager.SfxclpPlay("sfxclpPowerUp");
                 iHealth += collider.gameObject.GetComponent<PowerUpController>().iValue;
             }
             if (iHealth > iHealthMax)

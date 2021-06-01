@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class EnemyFistController : MonoBehaviour
 {
+    private GameManager gameManager;
     public GameObject goEnemy;
     private EnemyController enemyController;
 
@@ -12,6 +13,7 @@ public class EnemyFistController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        gameManager = GameObject.Find("Game Manager").GetComponent<GameManager>();
         enemyController = goEnemy.GetComponent<EnemyController>();
     }
 
@@ -28,6 +30,14 @@ public class EnemyFistController : MonoBehaviour
         if (    (enemyController.bAttackInDamagePhase)
             &&  (collider.gameObject.CompareTag("Player")) )
         {
+            if (UnityEngine.Random.Range(0,2) == 0)
+            {
+                gameManager.SfxclpPlay("sfxclpEnemyAttackDamage1");
+            }
+            else
+            {
+                gameManager.SfxclpPlay("sfxclpEnemyAttackDamage2");
+            }
             collider.gameObject.GetComponent<PlayerController>().Attacked(enemyController.iDamage);
         }
     }
