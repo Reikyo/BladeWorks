@@ -279,4 +279,26 @@ public class PlayerController : MonoBehaviour
 
     // ------------------------------------------------------------------------------------------------
 
+    // This requires a Collider component on both objects, and "Is Trigger" enabled on one of them.
+    // Also, a RigidBody component must be on at least one of them, it doesn't matter which one.
+    private void OnTriggerEnter(Collider collider)
+    {
+        if (collider.gameObject.CompareTag("PowerUp"))
+        {
+            if (iHealth < iHealthMax)
+            {
+                Destroy(collider.gameObject);
+                // gameManager.SfxclpPlay("sfxclpPowerUp");
+                iHealth += collider.gameObject.GetComponent<PowerUpController>().iValue;
+            }
+            if (iHealth > iHealthMax)
+            {
+                iHealth = iHealthMax;
+            }
+            sliHealth.value = iHealth;
+        }
+    }
+
+    // ------------------------------------------------------------------------------------------------
+
 }
