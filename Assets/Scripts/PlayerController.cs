@@ -17,8 +17,8 @@ public class PlayerController : MonoBehaviour
     private bool bAnimateWalkLastFrame = false;
     private bool bTrgSfx = false;
 
-    private float fMetresPerSecWalk = 5f;
-    private float fForceJump = 300f;
+    public float fMetresPerSecWalk = 15f;
+    public float fForceJump = 300f;
     private float fTimeTrgJump = 0f;
     private float fTimeTrgJumpDelay = 0.1f;
     private float fInputHorz;

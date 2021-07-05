@@ -11,5 +11,6 @@ obj
 Packages
 Temp
 Videos
+*.DS_Store
 *.csproj
 *.sln

@@ -17,7 +17,7 @@ public class CameraController : MonoBehaviour
     public float fLookAtWRTPlayerUp = 2f;
     public float fPosYLower = 0.3f;
     public float fPosYUpper = 3f;
-    public float fDegPerSec = 50f;
+    public float fDegPerSec = 270f;
     private float fInputHorz;
     private float fInputVert;
     private GameObject goPlayer;
